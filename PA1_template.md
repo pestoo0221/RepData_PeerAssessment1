@@ -7,7 +7,8 @@ Reproducible Research: Peer Assessment 1
 
 Load Data: Please make sure the data file is in your current working directory.
 
-```{r}
+
+```r
 data <- read.csv("./activity.csv")
 ```
 
@@ -17,80 +18,130 @@ Note: For this part of the assignment, the missing values in the dataset are ign
 
 A histogram of the total number of steps taken each day is made to answer this question.
 
-```{r fig.width=7, fig.height=6}
+
+```r
 data1 <- tapply(data$steps, data$date, sum, na.rm = TRUE)
 hist(data1,xlab="Total Number of Steps per Day", main="Histogram of Total Number of Steps per Day",col="red")
 ```
 
+![plot of chunk unnamed-chunk-2](figure/unnamed-chunk-2-1.png) 
+
 Mean of total number of steps taken per day:
-```{r}
+
+```r
 mean(data1)
 ```
+
+```
+## [1] 9354.23
+```
 Median of total number of steps taken per day:
-```{r}
+
+```r
 median(data1)
+```
+
+```
+## [1] 10395
 ```
 
 ### Q2: What is the average daily activity pattern?
 
 The figure below shows a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis).
 
-```{r fig.width=7, fig.height=6}
+
+```r
 data3 <- tapply(data$steps, data$interval,mean, na.rm = TRUE )
 plot(names(data3),data3, xlab= "Interval",ylab= "Number of Steps",type="l",col="red", cex.axis=0.8, cex.lab=0.8)
 title("Averaged Daily 5-minate Interval Steps Pattern",cex.main=0.9)
 ```
 
+![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5-1.png) 
+
 The 5-minute interval starting from the below time contains the maximum number of steps on average across all the days in the dataset:
-```{r}
+
+```r
 names(which.max(data3))
+```
+
+```
+## [1] "835"
 ```
 
 ### Q3: Imputing missing values
 
 
 The total number of missing values in the dataset (i.e. the total number of rows with NAs) is:
-```{r}
+
+```r
 sum(is.na(data$steps))
+```
+
+```
+## [1] 2304
 ```
 
 Strategy for filling in all of the missing values in the dataset: each missing value is filled in with the mean for that 5-minute interval across all the days with valid data.
 
-```{r}
+
+```r
 data_new <- data 
 data4 <- which(is.na(data$steps)) # row index of which steps are NAs
 for (i in 1 : length(data4))
   { ind <- match(data[data4[i],3],names(data3)) # looking for the matched 5-time interval
     data_new[data4[i],1] <- data3[ind] # fill the mean of the matched 5-time interval to the missing value
   }
-``` 
+```
 "data_new" is the new dataset equal to the original dataset but with the missing data filled in.
 
 Histogram of the total number of steps taken each day:
-```{r fig.width=7, fig.height=6}
+
+```r
 data2 <- tapply(data_new$steps, data_new$date, sum)
 
 hist(data2, xlab= "Total Number of Steps per Day",main = "Histogram of Total Number of Steps per Day",col="red")
 ```
 
+![plot of chunk unnamed-chunk-9](figure/unnamed-chunk-9-1.png) 
+
 Mean of total number of steps taken per day:
-```{r}
+
+```r
 mean(data2)
 ```
+
+```
+## [1] 10766.19
+```
 Median of total number of steps taken per day:
-```{r}
+
+```r
 median(data2)
+```
+
+```
+## [1] 10766.19
 ```
 
 These values differ from the estimates from the first part of the assignment with a difference (current value - old value):   
 
 difference in mean:
-```{r}
+
+```r
 mean(data2) - mean(data1)
 ```
+
+```
+## [1] 1411.959
+```
 difference in median:
-```{r}
+
+```r
 median(data2) - median(data1)
+```
+
+```
+## [1] 371.1887
 ```
 
 The impact of imputing missing data on the estimates of the total daily number of steps:
@@ -103,7 +154,8 @@ Note: The dataset with the filled-in missing values are used for this part.
 
 Create a new factor variable "wkd" in the dataset with two levels -- "weekday" and "weekend" indicating whether a given date is a weekday or weekend day:
 
-```{r}
+
+```r
 wkd <- weekdays(as.Date(data$date))
 
 wkd_f <- rep("weekday",time = length(wkd))  
@@ -114,7 +166,8 @@ data_new$wkd <- as.factor(wkd_f)
 
 A panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis) is shown below:
 
-```{r fig.width=7, fig.height=6}
+
+```r
 data_new1 <- tapply(data_new$steps[data_new$wkd=="weekend"], data_new$interval[data_new$wkd=="weekend"],mean) # weekend steps over the full interval
 data_new2 <- tapply(data_new$steps[data_new$wkd=="weekday"], data_new$interval[data_new$wkd=="weekday"],mean) # weekday steps over the full interval
 
@@ -135,3 +188,5 @@ p4 <- ggplot(df, aes(x=interval, y=steps,fill=wkd)) +
   theme(legend.position="none") 
 p4 + xlab("Interval") + ylab("Number of Steps") 
 ```
+
+![plot of chunk unnamed-chunk-15](figure/unnamed-chunk-15-1.png) 
